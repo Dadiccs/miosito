@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Daniele Falcone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      color: #111;
+    }
+
+    /* -------- HERO -------- */
+
+    .hero {
+      min-height: 100vh;
+      padding: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--copper);
+      transition: background 2s ease;
+    }
+
+    h1 {
+      font-size: clamp(4rem, 12vw, 10rem);
+      font-weight: 600;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      max-width: 900px;
+    }
+
+    .meta {
+      max-width: 420px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: rgba(0,0,0,0.7);
+    }
+
+    .nav {
+      display: flex;
+      gap: 32px;
+      font-size: 0.9rem;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: rgba(0,0,0,0.75);
+      border-bottom: 1px solid rgba(0,0,0,0.4);
+      cursor: pointer;
+    }
+
+    .phase {
+      font-size: 0.8rem;
+      color: rgba(0,0,0,0.6);
+      margin-top: 16px;
+    }
+
+    /* -------- ESERCIZI -------- */
+
+    .exercises {
+      padding: 120px 80px;
+      background: #fff;
+    }
+
+    .exercises h2 {
+      font-size: 2.4rem;
+      font-weight: 500;
+      margin-bottom: 48px;
+    }
+
+    .exercise {
+      font-size: 1.1rem;
+    }
+
+    .exercise span {
+      font-size: 0.8rem;
+      color: #888;
+      margin-right: 12px;
+    }
+
+    .exercise a {
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+      color: inherit;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Daniele<br>Falcone</h1>
+
+    <div class="meta">
+      Studente di Comunicazione visiva. Sperimentando con il codice<br>  
+      Questa superficie rappresenta l’inizio del processo:
+      rame appena esposto, prima dell’ossidazione.
+    </div>
+
+    <div>
+        <nav class="nav">
+            <a href="#" target="_blank">Instagram</a>
+            <a href="#" target="_blank">Behance</a>
+            <a href="#" target="_blank">LinkedIn</a>
+            <a id="goExercises">Esercizi ↓</a>
+        </nav>
+
+
+
+      <div class="phase" id="phaseText"></div>
+    </div>
+  </section>
+
+  <!-- ESERCIZI -->
+  <section class="exercises" id="esercizi">
+    <h2>Esercizi</h2>
+
+    <div class="exercise" id="exercise1">
+      <span>Oggi</span>
+      <a href="#" target="_blank">Esercizio 1 — testo segna posto</a>
+    </div>
+  </section>
+
+  <script>
+  /*
+    FASI DEL RAME 
+    0 = rame nuovo
+    4 = completamente ossidato
+  */
+  const phaseIndex = 4;
+
+  const copperPhases = [
+    { r: 255, g: 127, b: 30 },  // rame nuovo
+    { r: 196, g: 110, b: 54 },  // leggermente ossidato
+    { r: 152, g: 126, b: 86 },  // ossidazione media
+    { r: 108, g: 135, b: 102 }, // ossidato
+    { r: 92,  g: 156, b: 144 }  // verde acqua
+  ];
+
+  const phaseTexts = [
+    "Fase 1 — rame nuovo, superficie brillante",
+    "Fase 2 — ossidazione iniziale",
+    "Fase 3 — ossidazione intermedia",
+    "Fase 4 — rame ossidato",
+    "Fase 5 — patina completa"
+  ];
+
+  const c = copperPhases[phaseIndex];
+  const currentColor = `rgb(${c.r}, ${c.g}, ${c.b})`;
+
+    // applicazione colore
+    document.querySelector(".hero").style.background = currentColor;
+    document.getElementById("exercise1").style.color = currentColor;
+
+    // testo fase
+    document.getElementById("phaseText").textContent =
+        phaseTexts[phaseIndex];
+
+    // scroll solo su click
+    document
+    .getElementById("goExercises")
+    .addEventListener("click", () => {
+      document
+        .getElementById("esercizi")
+        .scrollIntoView({ behavior: "smooth" });
+    });
+</script>
+
+
+</body>
+</html>
