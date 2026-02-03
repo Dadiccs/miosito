@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Viewer</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/p5.js-3d@0.0.7/lib/p5.js-3d.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/p5.obj@1.1.1/p5.obj.min.js"></script>
+
+<style>
+body {
+    margin: 0;
+    overflow: hidden;
+    background: #181818;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+canvas {
+    display: block;
+}
+
+/* BOTTONI */
+.ui-btn {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 14px 26px;
+    border-radius: 999px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    font-size: 15px;
+    transition: all 0.25s ease;
+}
+
+.ui-btn:hover {
+    background: rgba(255,255,255,0.18);
+    transform: translateY(-2px);
+}
+
+.ui-btn:active {
+    background: rgba(255,255,255,0.25);
+}
+
+/* SLIDER VERTICALE */
+.ui-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 180px;
+    height: 4px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 999px;
+    outline: none;
+    transform: rotate(-90deg);
+}
+
+.ui-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.ui-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+<script>
+/* =========================
+   VARIABILI GLOBALI
+========================= */
+let model3D, textureImg;
+let angle = 0;
+let rotationSpeed = 0.01;
+
+const FIXED_SCALE = 3.6;
+
+let showWireframe = false;
+
+let btnWire, btnTex;
+let speedSlider;
+
+/* =========================
+   PRELOAD
+========================= */
+function preload() {
+    model3D = loadModel('Dadiscano.obj', true);
+    textureImg = loadImage('Dadiscano.jpg');
+}
+
+/* =========================
+   SETUP
+========================= */
+function setup() {
+    createCanvas(windowWidth, windowHeight, WEBGL);
+
+    btnWire = createButton('Wireframe');
+    btnWire.addClass('ui-btn');
+    btnWire.mousePressed(() => showWireframe = true);
+
+    btnTex = createButton('Texture');
+    btnTex.addClass('ui-btn');
+    btnTex.mousePressed(() => showWireframe = false);
+
+    speedSlider = createSlider(0, 0.08, rotationSpeed, 0.001);
+    speedSlider.addClass('ui-slider');
+
+    positionUI();
+}
+
+/* =========================
+   DRAW
+========================= */
+function draw() {
+    background(20);
+
+    rotationSpeed = speedSlider.value();
+    angle += rotationSpeed;
+
+    rotateY(angle);
+    rotateX(PI);
+    scale(FIXED_SCALE);
+
+    if (showWireframe) {
+        noFill();
+        stroke(0, 255, 100);
+        strokeWeight(0.3);
+    } else {
+        noStroke();
+        texture(textureImg);
+    }
+
+    model(model3D);
+}
+
+/* =========================
+   UI POSITION
+========================= */
+function positionUI() {
+    const y = windowHeight - 90;
+    const gap = 110;
+
+    const totalWidth =
+        btnWire.width +
+        btnTex.width +
+        gap;
+
+    let x = (windowWidth - totalWidth) / 2;
+
+    btnWire.position(x, y);
+    btnTex.position(x + btnWire.width + gap, y);
+
+    speedSlider.position(-70, windowHeight / 2);
+}
+
+/* =========================
+   RESIZE
+========================= */
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+    positionUI();
+}
+</script>
+</body>
+</html>
