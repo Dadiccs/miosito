@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Daniele Falcone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .hero > * {
+      position: relative;
+      z-index: 2;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      color: var(--copper-text);
+    }
+
+    /* -------- HERO -------- */
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      padding: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background-color: var(--copper);
+      transition: background-color 2s ease;
+    }
+
+    h1 {
+      font-size: clamp(4rem, 12vw, 10rem);
+      font-weight: 600;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      max-width: 900px;
+    }
+
+    .meta {
+      max-width: 420px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .nav {
+      display: flex;
+      gap: 32px;
+      font-size: 0.9rem;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--copper-text);
+      border-bottom: 1px solid var(--copper-text);
+      cursor: pointer;
+    }
+
+    .phase {
+      font-size: 0.8rem;
+      margin-top: 16px;
+    }
+
+    .meta,
+    .phase {
+      color: var(--copper-text);
+      opacity: 0.85;
+    }
+
+    /* -------- ESERCIZI -------- */
+
+    .exercises {
+      padding: 120px 80px;
+      background: #fff;
+    }
+
+    .exercises h2 {
+      font-size: 2.4rem;
+      font-weight: 500;
+      margin-bottom: 48px;
+    }
+
+    .exercise {
+      font-size: 1.1rem;
+      color: var(--copper-text);
+    }
+
+    .exercise span {
+      font-size: 0.8rem;
+      color: #888;
+      margin-right: 12px;
+    }
+
+    .exercise a {
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+      color: inherit;
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        padding: 40px 24px;
+      }
+
+      .exercises {
+        padding: 80px 24px;
+      }
+
+      .nav {
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .meta {
+        max-width: 100%;
+      }
+
+      h1 {
+        font-size: clamp(3rem, 14vw, 6rem);
+      }
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: var(--copper);
+      color: #111;
+      padding: 24px;
+      width: 90%;
+      max-width: 360px;
+      border-radius: 16px;
+      position: relative;
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+    }
+
+    .captcha {
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    #emailReveal {
+      margin-top: 20px;
+    }
+
+    #emailReveal a {
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+      color: inherit;
+    }
+
+    .close {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Daniele<br />Falcone</h1>
+
+    <div class="meta">
+      Studente di Comunicazione visiva.<br />
+    </div>
+
+    <div>
+      <nav class="nav">
+        <a href="https://www.instagram.com/dadiccs" target="_blank">Instagram</a>
+        <a href="https://www.behance.net/danielefalcone1" target="_blank">Behance</a>
+        <a href="#" id="emailBtn">Email</a>
+        <a id="goExercises">Esercizi ↓</a>
+      </nav>
+
+      <div class="phase" id="phaseText"></div>
+    </div>
+  </section>
+
+  <!-- ESERCIZI -->
+  <section class="exercises" id="esercizi">
+    <h2>Esercizi</h2>
+
+    <div class="exercise" id="exercise1">
+      <span>Oggi</span>
+      <a href="#" target="_blank">Esercizio 1 — Homepage</a>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      /*
+        FASI DEL RAME
+        0 = rame nuovo
+        4 = completamente ossidato
+      */
+
+      // DATA DI INIZIO PROGETTO 
+      const startDate = new Date("2026-02-02");
+      startDate.setHours(0, 0, 0, 0);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // giorni passati
+      const daysPassed = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+
+      // fase automatica (max 4)
+      const phaseIndex = Math.min(daysPassed, 4);
+
+      // palette rame → patina
+      const copperPhases = [
+        { r: 255, g: 127, b: 30 }, // rame nuovo
+        { r: 196, g: 110, b: 54 }, // leggermente ossidato
+        { r: 152, g: 126, b: 86 }, // ossidazione media
+        { r: 108, g: 135, b: 102 }, // ossidato
+        { r: 92, g: 156, b: 144 }, // verde acqua
+      ];
+
+      const phaseTexts = [
+        "Fase 1 — rame nuovo, superficie brillante. Torna domani per scoprire come si trasforma",
+        "Fase 2 — ossidazione iniziale. Torna domani per scoprire come si trasforma",
+        "Fase 3 — ossidazione intermedia. Torna domani per scoprire come si trasforma",
+        "Fase 4 — rame ossidato. Torna domani per scoprire come si trasforma",
+        "Fase 5 — patina completa. Congratulazioni, hai scoperto la fase finale di questa pagina web",
+      ];
+
+      const c = copperPhases[phaseIndex];
+      const currentColor = `rgb(${c.r}, ${c.g}, ${c.b})`;
+
+      // applicazione colore
+      document.documentElement.style.setProperty("--copper", currentColor);
+      const darkText = `rgb(${c.r * 0.35}, ${c.g * 0.35}, ${c.b * 0.35})`;
+      document.documentElement.style.setProperty("--copper-text", darkText);
+      document.getElementById("exercise1").style.color = currentColor;
+
+      // testo fase
+      document.getElementById("phaseText").textContent = phaseTexts[phaseIndex];
+
+      // scroll solo su click (rimane invariato)
+      document.getElementById("goExercises").addEventListener("click", () => {
+        document.getElementById("esercizi").scrollIntoView({ behavior: "smooth" });
+      });
+
+      const emailBtn = document.getElementById("emailBtn");
+      const modal = document.getElementById("emailModal");
+      const closeBtn = modal.querySelector(".close");
+      const checkbox = document.getElementById("robotCheck");
+      const reveal = document.getElementById("emailReveal");
+      const emailLink = document.getElementById("emailLink");
+
+      emailBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        modal.classList.remove("hidden");
+      });
+
+      closeBtn.addEventListener("click", () => {
+        modal.classList.add("hidden");
+        checkbox.checked = false;
+        reveal.classList.add("hidden");
+      });
+
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          const user = "daniele.falcone02";
+          const domain = "gmail.com";
+
+          emailLink.href = `mailto:${user}@${domain}`;
+          emailLink.textContent = `${user}@${domain}`;
+          reveal.classList.remove("hidden");
+        }
+      });
+    });
+  </script>
+
+  <!-- EMAIL MODAL -->
+  <div id="emailModal" class="modal hidden">
+    <div class="modal-content">
+      <button class="close">×</button>
+
+      <p class="modal-title">Verifica umana</p>
+
+      <label class="captcha">
+        <input type="checkbox" id="robotCheck" />
+        Non sono un robot
+      </label>
+
+      <div id="emailReveal" class="hidden">
+        <a id="emailLink">Scrivimi</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
