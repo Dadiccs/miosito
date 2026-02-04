@@ -1,175 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Me, Myself and AI</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Me, Myself & AI</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/p5.js-3d@0.0.7/lib/p5.js-3d.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/p5.obj@1.1.1/p5.obj.min.js"></script>
 
 <style>
-body {
+  :root {
+    --accent-color: #e9a4bb;
+    --bg-dark: #080808;
+  }
+
+  body {
     margin: 0;
     overflow: hidden;
-    background: #181818;
-    font-family: system-ui, -apple-system, sans-serif;
-}
+    background: #020202;
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--accent-color);
+  }
+  canvas { display: block; }
 
-canvas {
+  /* SCANLINES EFFECT OVERLAY */
+  body::before {
+    content: " ";
     display: block;
-}
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.04));
+    z-index: 200;
+    background-size: 100% 3px, 3px 100%;
+    pointer-events: none;
+  }
 
-/* BOTTONI */
-.ui-btn {
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.15);
-    padding: 14px 26px;
-    border-radius: 999px;
+  /* PANEL DESIGN */
+  .control-deck {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    width: 250px;
+    background: var(--bg-dark);
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    z-index: 100;
+  }
+
+  .panel-header {
+    background: var(--accent-color);
+    color: #000;
+    padding: 8px 15px;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .panel-content { padding: 20px; }
+  h3 { font-size: 10px; margin: 0 0 12px 0; letter-spacing: 1px; color: var(--accent-color); opacity: 0.8; }
+  .section { margin-bottom: 25px; }
+
+  /* BUTTONS & LINKS */
+  .button-group { display: flex; flex-direction: column; gap: 4px; }
+  .ui-btn {
+    background: transparent;
+    color: var(--accent-color);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 12px 15px;
     cursor: pointer;
-    backdrop-filter: blur(8px);
-    font-size: 15px;
-    transition: all 0.25s ease;
-}
+    font-family: inherit;
+    font-size: 11px;
+    text-align: left;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    text-decoration: none; /* Per il tag <a> */
+    display: block; /* Per il tag <a> */
+  }
+  .ui-btn:hover { background: rgba(255,255,255,0.05); border-color: var(--accent-color); }
+  .ui-btn.active { background: var(--accent-color); color: #000; font-weight: bold; border-color: var(--accent-color); }
 
-.ui-btn:hover {
-    background: rgba(255,255,255,0.18);
-    transform: translateY(-2px);
-}
+  /* HOME BUTTON SPECIFIC */
+  .home-section {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 20px;
+    margin-top: 10px;
+  }
+  .home-btn {
+    text-align: center;
+    border-style: dashed;
+    opacity: 0.7;
+  }
+  .home-btn:hover { opacity: 1; border-style: solid; }
 
-.ui-btn:active {
-    background: rgba(255,255,255,0.25);
-}
+  /* SLIDERS & COLORS (INVARIATI) */
+  .slider-box { margin-bottom: 15px; }
+  .ui-slider { -webkit-appearance: none; width: 100%; height: 1px; background: var(--accent-color); outline: none; }
+  .ui-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 18px; background: var(--accent-color); cursor: pointer; border: 1px solid #fff; }
+  .color-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+  .color-dot { width: 100%; aspect-ratio: 1; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); box-sizing: border-box; transition: all 0.2s ease; }
+  .color-dot.active { border: 2px solid #fff; box-shadow: 0 0 10px var(--accent-color); }
 
-/* SLIDER VERTICALE */
-.ui-slider {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 180px;
-    height: 4px;
-    background: rgba(255,255,255,0.25);
-    border-radius: 999px;
-    outline: none;
-    transform: rotate(-90deg);
-}
-
-.ui-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #ffffff;
-    cursor: pointer;
-}
-
-.ui-slider::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #ffffff;
-    cursor: pointer;
-}
+  #color-section { display: none; }
+  #color-section.visible { display: block; }
 </style>
 </head>
 
 <body>
+
+<div class="control-deck">
+  <div class="panel-header">
+    <span>CORE_OS_v.2.4</span>
+    <span>[ LIVE ]</span>
+  </div>
+  
+  <div class="panel-content">
+    <div class="section">
+      <h3>> RENDER_PROTOCOLS</h3>
+      <div class="button-group" id="btn-group"></div>
+    </div>
+
+    <div class="section">
+      <h3>> GEO_CALIBRATION</h3>
+      <div id="scale-slider-anchor" class="slider-box"></div>
+      <div id="speed-slider-anchor" class="slider-box"></div>
+    </div>
+
+    <div class="section" id="color-section">
+      <h3>> CHROMA_OVERRIDE</h3>
+      <div class="color-grid" id="color-grid"></div>
+    </div>
+
+    <div class="section home-section">
+      <a href="https://dadiccs.github.io/miosito/" class="ui-btn home-btn">[X] RETURN_HOME</a>
+    </div>
+  </div>
+</div>
+
 <script>
-/* =========================
-   VARIABILI GLOBALI
-========================= */
-let model3D, textureImg;
-let angle = 0;
-let rotationSpeed = 0.01;
+  // ... (Tutto il codice JavaScript precedente rimane identico) ...
+  let model3D, textureImg;
+  let angle = 0, bounceTime = 0;
+  let currentMode = 'texture'; 
+  let wireColor = { r: 0, g: 255, b: 100 };
+  const TEXTURE_PINK = { r: 255, g: 102, b: 204, hex: '#ff66cc' };
 
-const FIXED_SCALE = 3.6;
+  const GREEN = { r: 0, g: 255, b: 100, hex: '#00ff64' };
+  const COPPER_COLORS = [
+    { r: 255, g: 127, b: 30, hex: '#ff7f1e' },
+    { r: 196, g: 110, b: 54, hex: '#c46e36' },
+    { r: 152, g: 126, b: 86, hex: '#987e56' },
+    { r: 108, g: 135, b: 102, hex: '#6c8766' },
+    { r: 92, g: 156, b: 144, hex: '#5c9c90' }
+  ];
 
-let showWireframe = false;
-
-let btnWire, btnTex;
-let speedSlider;
-
-/* =========================
-   PRELOAD
-========================= */
-function preload() {
+  function preload() {
     model3D = loadModel('Dadiscano.obj', true);
     textureImg = loadImage('Dadiscano.jpg');
-}
+  }
 
-/* =========================
-   SETUP
-========================= */
-function setup() {
+  function setup() {
     createCanvas(windowWidth, windowHeight, WEBGL);
 
-    btnWire = createButton('Wireframe');
-    btnWire.addClass('ui-btn');
-    btnWire.mousePressed(() => showWireframe = true);
+    scaleSlider = createSlider(0, 1, 0.5, 0.001).addClass('ui-slider').parent('scale-slider-anchor');
+    speedSlider = createSlider(0, 0.08, 0.01, 0.001).addClass('ui-slider').parent('speed-slider-anchor');
 
-    btnTex = createButton('Texture');
-    btnTex.addClass('ui-btn');
-    btnTex.mousePressed(() => showWireframe = false);
+    const modes = [
+      { id: 'texture', label: 'Neural_Surface' },
+      { id: 'wireframe', label: 'Wireframe' },
+      { id: 'explode', label: 'Kinetic_Fragment' }
+    ];
 
-    speedSlider = createSlider(0, 0.08, rotationSpeed, 0.001);
-    speedSlider.addClass('ui-slider');
+    const btnGroup = select('#btn-group');
+    modes.forEach(m => {
+      let b = createButton(m.label).addClass('ui-btn').parent(btnGroup);
+      if (m.id === 'texture') b.addClass('active');
+      b.mousePressed(() => updateMode(m.id, b));
+    });
 
-    positionUI();
-}
+    const colorGrid = select('#color-grid');
+    [GREEN, ...COPPER_COLORS].forEach(c => {
+      let dot = createDiv().addClass('color-dot').parent(colorGrid);
+      dot.style('background', c.hex);
+      dot.mousePressed(() => {
+        wireColor = c;
+        updateAccentColor(c.hex);
+        selectAll('.color-dot').forEach(d => d.removeClass('active'));
+        dot.addClass('active');
+      });
+    });
+  }
 
-/* =========================
-   DRAW
-========================= */
-function draw() {
-    background(20);
+  function updateAccentColor(hex) {
+    document.documentElement.style.setProperty('--accent-color', hex);
+  }
 
-    rotationSpeed = speedSlider.value();
+  function updateMode(mode, btn) {
+    currentMode = mode;
+    selectAll('.ui-btn').forEach(b => b.removeClass('active'));
+    btn.addClass('active');
+    const colorSec = select('#color-section');
+    if (mode === 'texture') {
+      colorSec.removeClass('visible');
+      updateAccentColor(TEXTURE_PINK.hex);
+    } else {
+      colorSec.addClass('visible');
+      updateAccentColor(`rgb(${wireColor.r},${wireColor.g},${wireColor.b})`);
+    }
+  }
+
+  function draw() {
+    background(5);
+    if (currentMode === 'texture') {
+      ambientLight(200); 
+      directionalLight(255, 255, 255, 0.5, 0.5, -1);
+      directionalLight(150, 150, 150, -0.5, -0.5, 1);
+    } else {
+      ambientLight(150);
+      pointLight(255, 255, 255, 0, 0, 200);
+    }
+    
+    let rotationSpeed = speedSlider.value();
     angle += rotationSpeed;
+    let modelScale = lerp(2.0, 5.2, scaleSlider.value());
+    bounceTime += 0.03;
+    let bounceY = sin(bounceTime) * 25;
 
+    push();
+    translate(0, bounceY, 0);
     rotateY(angle);
     rotateX(PI);
-    scale(FIXED_SCALE);
+    scale(modelScale);
 
-    if (showWireframe) {
-        noFill();
-        stroke(0, 255, 100);
-        strokeWeight(0.3);
-    } else {
-        noStroke();
-        texture(textureImg);
+    if (currentMode === 'wireframe') {
+      noFill();
+      stroke(wireColor.r, wireColor.g, wireColor.b);
+      strokeWeight(0.3);
+      model(model3D);
+    } 
+    else if (currentMode === 'explode') {
+      drawExploded();
     }
+    else {
+      noStroke();
+      texture(textureImg);
+      model(model3D);
+    }
+    pop();
+  }
 
-    model(model3D);
-}
+  function drawExploded() {
+    let expandX = map(mouseX, 0, width, 0, 1.2);
+    let expandY = map(mouseY, 0, height, 0, 1.2);
+    for (let i = 0; i < 5; i++) {
+      push();
+      let isGlitching = random(1) < 0.015;
+      let vShift = sin(bounceTime + i * 0.5) * (expandX * 15) + (i * expandY * 20);
+      let hShift = isGlitching ? random(-8, 8) * expandX : 0;
+      translate(hShift, vShift, 0);
+      rotateY(i * expandX * 0.3);
+      rotateX(i * expandY * 0.2);
+      scale(1 + (i * expandX * 0.4));
+      noFill();
+      let alpha = map(i, 0, 5, 255, 40);
+      if (isGlitching) { stroke(255, 255, 255, 200); strokeWeight(random(0.5, 1.5)); }
+      else { stroke(wireColor.r, wireColor.g, wireColor.b, alpha); strokeWeight(0.4 / (i + 1)); }
+      model(model3D);
+      pop();
+    }
+  }
 
-/* =========================
-   UI POSITION
-========================= */
-function positionUI() {
-    const y = windowHeight - 90;
-    const gap = 110;
-
-    const totalWidth =
-        btnWire.width +
-        btnTex.width +
-        gap;
-
-    let x = (windowWidth - totalWidth) / 2;
-
-    btnWire.position(x, y);
-    btnTex.position(x + btnWire.width + gap, y);
-
-    speedSlider.position(-70, windowHeight / 2);
-}
-
-/* =========================
-   RESIZE
-========================= */
-function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-    positionUI();
-}
+  function windowResized() { resizeCanvas(windowWidth, windowHeight); }
 </script>
 </body>
 </html>
