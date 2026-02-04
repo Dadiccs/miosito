@@ -6,9 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-    /* IMPORTANTE: Assicurati di caricare il Suisse Mono correttamente. 
-       Sostituisci i percorsi con quelli dei tuoi file font.
-    */
+    /* FONT CONFIGURATION */
     @font-face {
       font-family: 'Suisse Mono';
       src: local('Suisse Intl Mono Trial Bold'),
@@ -52,10 +50,10 @@
       background-color: var(--bg-dark);
       color: var(--accent-color);
       font-family: 'Suisse Mono', monospace;
-      padding: 60px 8vw; /* Layout allargato e non centrato */
+      padding: 60px 8vw;
       line-height: 1.5;
       overflow-x: hidden;
-      text-shadow: 0 0 5px rgba(85, 255, 0, 0.3);
+      text-shadow: 0 0 5px rgba(0, 255, 100, 0.3);
     }
 
     /* EFFETTI CRT */
@@ -71,15 +69,14 @@
       opacity: 0.3;
     }
 
-    /* INFO DI SISTEMA (TOP & BOTTOM) */
+    /* INFO DI SISTEMA */
     .sys-info {
       font-weight: 100;
       font-size: 10px;
       letter-spacing: 2px;
       opacity: 0.5;
       margin-bottom: 40px;
-      border-bottom: 1px solid var(--accent-color); /* Usa la variabile invece del rosa fisso */
-      opacity: 0.5;
+      border-bottom: 1px solid var(--accent-color);
       padding-bottom: 10px;
       display: flex;
       justify-content: space-between;
@@ -106,7 +103,7 @@
 
     .section {
       margin-bottom: 60px;
-      display: none; /* Per l'effetto comparsa */
+      display: none;
     }
 
     h1 {
@@ -124,34 +121,37 @@
       font-size: 16px;
     }
 
-    /* NAV & ESERCIZI */
+    /* NAV & BUTTONS (UNIFICATI) */
     .menu-list { list-style: none; margin-top: 15px; }
     .menu-item { margin-bottom: 8px; }
     
-    .menu-link {
+    .ui-link {
       font-weight: normal;
       text-decoration: none;
       color: var(--accent-color);
       padding: 4px 10px;
       border: 1px solid transparent;
       transition: 0.1s;
+      display: inline-block;
     }
-    .menu-link:hover {
+    .ui-link:hover {
       background: var(--accent-color);
       color: #000;
+      border-color: var(--accent-color);
     }
 
+    /* FILE REPOSITORY STYLE */
     .file-table { margin-top: 20px; width: 100%; max-width: 800px; }
     .file-row {
       display: grid;
       grid-template-columns: 120px 150px 1fr;
-      padding: 8px 0;
+      padding: 12px 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       font-size: 12px;
+      align-items: center;
     }
     .file-row.header { font-weight: bold; opacity: 0.4; text-transform: lowercase; }
     .perms { font-weight: 100; opacity: 0.5; }
-    .file-name a { color: #fff; text-decoration: none; font-weight: bold; }
 
     /* CURSOR */
     .cursor {
@@ -183,7 +183,7 @@
   <div class="sys-info">
     <span>OS_KERNEL: 2.4.0-DF</span>
     <span>STATION: MEND_CH_904</span>
-    <span>Uptime: 00:04:22</span>
+    <span>UPTIME: 00:04:22</span>
   </div>
 
   <div class="terminal-main">
@@ -204,9 +204,9 @@
     <div class="section" id="sec-3">
       <span class="prompt">ls --network</span>
       <ul class="menu-list">
-        <li class="menu-item"><a href="https://www.instagram.com/dadiccs" target="_blank" class="menu-link">> INSTAGRAM</a></li>
-        <li class="menu-item"><a href="https://www.behance.net/danielefalcone1" target="_blank" class="menu-link">> BEHANCE</a></li>
-        <li class="menu-item"><a href="#" id="emailBtn" class="menu-link">> CONTACT_CLIENT</a></li>
+        <li class="menu-item"><a href="https://www.instagram.com/dadiccs" target="_blank" class="ui-link">> INSTAGRAM</a></li>
+        <li class="menu-item"><a href="https://www.behance.net/danielefalcone1" target="_blank" class="ui-link">> BEHANCE</a></li>
+        <li class="menu-item"><a href="#" id="emailBtn" class="ui-link">> CONTACT_CLIENT</a></li>
       </ul>
     </div>
 
@@ -218,11 +218,15 @@
         </div>
         <div class="file-row">
           <span class="perms">drwxr-xr-x</span><span>feb 02 2026</span>
-          <span class="file-name"><a href="#">homepage_v1.sys</a></span>
+          <span class="file-name">
+            <a href="#" class="ui-link">> homepage_v1.sys</a>
+          </span>
         </div>
         <div class="file-row">
           <span class="perms">-rwxr-xr-x</span><span>feb 03 2026</span>
-          <span class="file-name"><a href="https://dadiccs.github.io/miosito/giorno2/" target="_blank">me_myself_ai.sh</a></span>
+          <span class="file-name">
+            <a href="https://dadiccs.github.io/miosito/giorno2/" target="_blank" class="ui-link">> me_myself_ai.sh</a>
+          </span>
         </div>
       </div>
     </div>
@@ -290,7 +294,6 @@ function typeWriter(element, fullText, speed) {
     });
 }
 
-// Orologio in tempo reale nel footer
 function updateClock() {
     const now = new Date();
     document.getElementById('clock').textContent = now.toLocaleTimeString('it-IT');
@@ -301,7 +304,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Modale Email
     const emailBtn = document.getElementById("emailBtn");
     const modal = document.getElementById("emailModal");
     const closeBtn = document.getElementById("closeModal");
