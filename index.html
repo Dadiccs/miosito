@@ -17,11 +17,6 @@
       src: local('Suisse Intl Mono Trial Regular'), url('fonts/SuisseIntlMonoTrial-Regular.otf') format('opentype');
       font-weight: normal;
     }
-    @font-face {
-      font-family: 'Suisse Mono';
-      src: local('Suisse Intl Mono Trial Thin'), url('fonts/SuisseIntlMonoTrial-Thin.otf') format('opentype');
-      font-weight: 100;
-    }
 
     :root {
       --accent-color: #00ff64;
@@ -43,128 +38,85 @@
       position: relative;
     }
 
-    /* EFFETTO CRT */
     body::before {
-      content: " ";
-      display: block;
-      position: fixed;
-      inset: 0;
+      content: " "; display: block; position: fixed; inset: 0;
       background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
-      z-index: 3000;
-      background-size: 100% 2px;
-      pointer-events: none;
-      opacity: 0.2;
+      z-index: 3000; background-size: 100% 2px; pointer-events: none; opacity: 0.2;
     }
 
-    /* --- 6. DRAGGABLE WINDOW --- */
     #window-frame {
-      position: absolute;
-      width: 85vw;
-      max-width: 1100px;
-      height: 80vh;
-      background: var(--bg-dark);
-      border: 1px solid var(--window-border);
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-      z-index: 10;
+      position: absolute; width: 85vw; max-width: 1100px; height: 85vh;
+      background: var(--bg-dark); border: 1px solid var(--window-border);
+      display: flex; flex-direction: column; box-shadow: 0 30px 60px rgba(0,0,0,0.8); z-index: 10;
     }
 
     .window-header {
-      background: #111;
-      border-bottom: 1px solid var(--window-border);
-      padding: 10px 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: move;
-      user-select: none;
-      touch-action: none; /* Fondamentale per il drag su mobile */
+      background: #111; border-bottom: 1px solid var(--window-border);
+      padding: 10px 15px; display: flex; justify-content: space-between; align-items: center;
+      cursor: move; user-select: none; touch-action: none;
     }
 
     .window-controls { display: flex; gap: 8px; }
     .control { width: 12px; height: 12px; border: 1px solid var(--accent-color); border-radius: 2px; }
     .control.close { background: var(--accent-color); }
 
-    /* CONTENUTO */
-    #terminal-content {
-      flex-grow: 1;
-      overflow-y: auto;
-      padding: 40px;
-      position: relative;
-    }
+    #terminal-content { flex-grow: 1; overflow-y: auto; padding: 30px; position: relative; scroll-behavior: smooth; }
 
     .sys-info {
-      font-weight: 100;
-      font-size: 10px;
-      letter-spacing: 2px;
-      opacity: 0.5;
-      margin-bottom: 30px;
-      border-bottom: 1px solid var(--accent-color);
-      padding-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
+      font-weight: 100; font-size: 10px; letter-spacing: 2px; opacity: 0.5;
+      margin-bottom: 20px; border-bottom: 1px solid var(--accent-color);
+      padding-bottom: 10px; display: flex; justify-content: space-between;
     }
 
-    /* --- 2. LOADING BAR --- */
-    #boot-sequence {
-      font-weight: 100;
-      font-size: 12px;
-      margin-bottom: 30px;
-      line-height: 1.4;
-    }
+    #boot-sequence { font-weight: 100; font-size: 12px; margin-bottom: 20px; line-height: 1.4; }
 
-    .prompt { font-weight: bold; margin-bottom: 10px; display: block; }
+    .prompt { font-weight: bold; margin-bottom: 8px; display: block; }
     .prompt::before { content: "root@d_falcone:~$ "; opacity: 0.7; }
 
-    .section { margin-bottom: 60px; display: none; }
+    .section { margin-bottom: 30px; display: none; }
 
-    h1 {
-      font-weight: bold;
-      font-size: clamp(2rem, 7vw, 5rem);
-      line-height: 0.9;
-      margin: 20px 0;
-      letter-spacing: -2px;
-    }
-
-    .desc-text { max-width: 600px; font-size: 16px; font-weight: normal; }
+    h1 { font-weight: bold; font-size: clamp(2rem, 6vw, 4rem); line-height: 0.9; margin: 15px 0; letter-spacing: -2px; }
+    .desc-text { max-width: 600px; font-size: 15px; font-weight: normal; }
 
     .ui-link {
       text-decoration: none; color: var(--accent-color);
       padding: 4px 10px; border: 1px solid transparent;
-      display: inline-block; transition: 0.1s;
+      display: inline-block; transition: 0.1s; cursor: pointer;
     }
     .ui-link:hover { background: var(--accent-color); color: #000; }
 
-    /* REPOSITORY TABLE */
-    .file-table { margin-top: 20px; width: 100%; font-size: 12px; }
+    .file-table { margin-top: 15px; width: 100%; font-size: 12px; }
     .file-row {
       display: grid; grid-template-columns: 100px 150px 1fr;
-      padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-      align-items: center;
+      padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); align-items: center;
     }
 
     .cursor {
-      display: inline-block; width: 12px; height: 1.2em;
+      display: inline-block; width: 10px; height: 1.2em;
       background: var(--accent-color); animation: blink 0.8s step-end infinite;
-      vertical-align: middle;
+      vertical-align: middle; margin-left: 2px;
     }
     @keyframes blink { 50% { opacity: 0; } }
 
-    /* MOBILE ADAPTATION */
-    @media (max-width: 600px) {
-      #window-frame { width: 95vw; height: 90vh; }
-      #terminal-content { padding: 20px; }
-      h1 { font-size: 2.5rem; }
-      .file-row { grid-template-columns: 80px 1fr; }
-      .file-row span:nth-child(2) { display: none; } /* Nasconde data su mobile */
+    #command-line { color: #fff; font-weight: bold; letter-spacing: 1px; }
+
+    #captcha-box {
+      border: 1px dashed var(--accent-color); padding: 15px; margin-top: 15px;
+      display: none; background: rgba(0,255,100,0.05);
     }
 
-    /* OVERLAY INIZIALE */
+    .help-output { color: #888; font-size: 11px; margin-bottom: 15px; line-height: 1.6; border-left: 2px solid var(--accent-color); padding-left: 15px; }
+
+    @media (max-width: 600px) {
+      #window-frame { width: 95vw; height: 90vh; }
+      h1 { font-size: 2.2rem; }
+      .file-row { grid-template-columns: 80px 1fr; }
+      .file-row span:nth-child(2) { display: none; }
+    }
+
     #overlay {
       position: fixed; inset: 0; background: #000; z-index: 4000;
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 20px;
+      display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px;
     }
     #start-button {
       background: transparent; color: var(--accent-color);
@@ -188,7 +140,7 @@
         <div class="control"></div>
         <div class="control"></div>
       </div>
-      <div style="font-size: 9px; opacity: 0.5; letter-spacing: 1px;">DF_WORKSTATION_V3.0</div>
+      <div style="font-size: 9px; opacity: 0.5; letter-spacing: 1px;">DF_WORKSTATION_V3.3</div>
       <div style="width: 40px;"></div>
     </div>
 
@@ -200,45 +152,54 @@
 
       <div id="boot-sequence"></div>
 
-      <div class="section" id="sec-1">
-        <span class="prompt">exec profile_init</span>
-        <h1 id="type-title">DANIELE FALCONE</h1>
+      <div id="main-content">
+          <div class="section" id="sec-1">
+            <span class="prompt">exec profile_init</span>
+            <h1 id="type-title">DANIELE FALCONE</h1>
+          </div>
+
+          <div class="section" id="sec-2">
+            <span class="prompt">cat bio.log</span>
+            <p class="desc-text" id="type-bio">
+              STUDENTE DI COMUNICAZIONE VISIVA.<br>
+              SPECIALIZZAZIONE: VISUAL DESIGN / DIGITAL ARTS.
+            </p>
+          </div>
+
+          <div class="section" id="sec-3">
+            <span class="prompt">ls --network</span>
+            <div style="margin-top:15px;">
+                <a href="https://www.instagram.com/dadiccs" target="_blank" class="ui-link">> INSTAGRAM</a><br><br>
+                <a href="https://www.behance.net/danielefalcone1" target="_blank" class="ui-link">> BEHANCE</a><br><br>
+                <div id="mail-container">
+                  <a onclick="showCaptcha()" class="ui-link" id="contact-trigger">> CONTACT_CLIENT</a>
+                  <div id="captcha-box">
+                    <input type="checkbox" id="not-a-bot" onclick="unlockMail()">
+                    <label for="not-a-bot" style="font-size: 10px; margin-left: 10px;">I AM NOT A BOT</label>
+                  </div>
+                </div>
+            </div>
+          </div>
+
+          <div class="section" id="sec-4">
+            <span class="prompt">cd /exercises && ls -la</span>
+            <div class="file-table">
+              <div class="file-row" style="opacity:0.3"><span>mode</span><span>last_mod</span><span>name</span></div>
+              <div class="file-row"><span>drwxr-xr-x</span><span>feb 02</span><span><a href="#" class="ui-link">> homepage_v4.5.sys</a></span></div>
+              <div class="file-row"><span>-rwxr-xr-x</span><span>feb 03</span><span><a href="https://dadiccs.github.io/miosito/giorno2/" target="_blank" class="ui-link">> me_myself_ai.sh</a></span></div>
+              <div class="file-row"><span>-rwxr-xr-x</span><span>feb 04</span><span><a href="https://dadiccs.github.io/miosito/giorno3/" target="_blank" class="ui-link">> ttyyyppppeee.exe</a></span></div>
+            </div>
+          </div>
       </div>
 
-      <div class="section" id="sec-2">
-        <span class="prompt">cat bio.log</span>
-        <p class="desc-text" id="type-bio">
-          STUDENTE DI COMUNICAZIONE VISIVA.<br>
-          SPECIALIZZAZIONE: VISUAL DESIGN / DIGITAL ARTS.
-        </p>
-      </div>
-
-      <div class="section" id="sec-3">
-        <span class="prompt">ls --network</span>
-        <div style="margin-top:15px;">
-            <a href="https://www.instagram.com/dadiccs" target="_blank" class="ui-link">> INSTAGRAM</a><br><br>
-            <a href="https://www.behance.net/danielefalcone1" target="_blank" class="ui-link">> BEHANCE</a><br><br>
-            <a href="mailto:daniele.falcone02@gmail.com" class="ui-link">> CONTACT_CLIENT</a>
-        </div>
-      </div>
-
-      <div class="section" id="sec-4">
-        <span class="prompt">cd /exercises && ls -la</span>
-        <div class="file-table">
-          <div class="file-row" style="opacity:0.3"><span>mode</span><span>last_mod</span><span>name</span></div>
-          <div class="file-row"><span>drwxr-xr-x</span><span>feb 02</span><span><a href="#" class="ui-link">> homepage_v1.sys</a></span></div>
-          <div class="file-row"><span>-rwxr-xr-x</span><span>feb 03</span><span><a href="https://dadiccs.github.io/miosito/giorno2/" target="_blank" class="ui-link">> me_myself_ai.sh</a></span></div>
-        </div>
-      </div>
-
-      <div id="active-line" style="margin-top: 40px; display:none;">
-        <span class="prompt"></span><span class="cursor"></span>
+      <div id="active-line" style="margin-top: 40px; display:none; padding-bottom: 60px;">
+        <div id="command-output"></div>
+        <span class="prompt"></span><span id="command-line"></span><span class="cursor"></span>
       </div>
     </div>
   </div>
 
 <script>
-// --- 5. AUDIO ENGINE ---
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function playSound(freq, type, duration, vol) {
     try {
@@ -257,12 +218,25 @@ function playSound(freq, type, duration, vol) {
 
 const clickSound = () => playSound(150, 'square', 0.05, 0.05);
 const bootSound = () => playSound(60, 'sawtooth', 1.0, 0.1);
+const cmdEnterSound = () => playSound(300, 'sine', 0.1, 0.05);
 
-// --- 6. DRAGGABLE LOGIC (MOUSE + TOUCH) ---
+function showCaptcha() {
+    document.getElementById('captcha-box').style.display = 'block';
+    document.getElementById('contact-trigger').style.display = 'none';
+}
+
+function unlockMail() {
+    setTimeout(() => {
+        document.getElementById('mail-container').innerHTML = 
+        `<a href="mailto:daniele.falcone02@gmail.com" class="ui-link">> DANIELE.FALCONE02@GMAIL.COM</a>`;
+        clickSound();
+    }, 500);
+}
+
+// DRAGGABLE
 const win = document.getElementById('window-frame');
 const handle = document.getElementById('drag-handle');
-let isDragging = false;
-let offset = [0,0];
+let isDragging = false, offset = [0,0];
 
 const startDrag = (e) => {
     isDragging = true;
@@ -270,7 +244,6 @@ const startDrag = (e) => {
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     offset = [win.offsetLeft - clientX, win.offsetTop - clientY];
 };
-
 const doDrag = (e) => {
     if (!isDragging) return;
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -278,87 +251,120 @@ const doDrag = (e) => {
     win.style.left = (clientX + offset[0]) + 'px';
     win.style.top = (clientY + offset[1]) + 'px';
 };
-
-const stopDrag = () => isDragging = false;
-
-handle.addEventListener('mousedown', startDrag);
-handle.addEventListener('touchstart', startDrag);
 document.addEventListener('mousemove', doDrag);
 document.addEventListener('touchmove', doDrag, { passive: false });
-document.addEventListener('mouseup', stopDrag);
-document.addEventListener('touchend', stopDrag);
+handle.addEventListener('mousedown', startDrag);
+handle.addEventListener('touchstart', startDrag);
+document.addEventListener('mouseup', () => isDragging = false);
+document.addEventListener('touchend', () => isDragging = false);
 
-// --- 2. BOOT & LOADING BAR ---
+// CLI ENGINE
+let inputBuffer = "";
+const commandLine = document.getElementById('command-line');
+const terminalContent = document.getElementById('terminal-content');
+const commandOutput = document.getElementById('command-output');
+
+document.addEventListener('keydown', (e) => {
+    if (document.getElementById('overlay').style.display === 'none') {
+        if (e.key === 'Enter') {
+            handleCommand(inputBuffer.toLowerCase().trim());
+            inputBuffer = "";
+            cmdEnterSound();
+        } else if (e.key === 'Backspace') {
+            inputBuffer = inputBuffer.slice(0, -1);
+            clickSound();
+        } else if (e.key.length === 1) {
+            inputBuffer += e.key;
+            clickSound();
+        }
+        commandLine.textContent = inputBuffer;
+        terminalContent.scrollTop = terminalContent.scrollHeight;
+    }
+});
+
+function handleCommand(cmd) {
+    if (cmd.startsWith('color ')) {
+        const color = cmd.replace('color ', '').trim();
+        document.documentElement.style.setProperty('--accent-color', color);
+    } else {
+        switch(cmd) {
+            case 'help':
+                commandOutput.innerHTML += `<div class="help-output">
+                    [COMMANDS LIST]<br>
+                    COLOR [HEX/NAME] : CHANGE SYSTEM THEME<br>
+                    LS               : RELOAD REPOSITORIES<br>
+                    CLEAR            : WIPE TERMINAL INTERFACE<br>
+                    HELP             : SHOW THIS LIST<br>---</div>`;
+                break;
+            case 'ls':
+                document.getElementById('main-content').style.display = 'block';
+                document.querySelectorAll('.section').forEach(s => s.style.display = 'block');
+                break;
+            case 'clear':
+                document.getElementById('main-content').style.display = 'none';
+                commandOutput.innerHTML = "";
+                break;
+            default: break;
+        }
+    }
+    setTimeout(() => {
+        terminalContent.scrollTop = terminalContent.scrollHeight;
+    }, 10);
+}
+
+// BOOT & SEQUENCER
 async function runBoot() {
     const boot = document.getElementById('boot-sequence');
-    const logs = [
-        "SEARCHING FOR DISK... FOUND",
-        "LOADING CORE_KERNEL.SYS...",
-        "INITIALIZING INTERFACE...",
-        "DECRYPTING PORTFOLIO_DATA..."
-    ];
-
+    const logs = ["SEARCHING FOR DISK... FOUND", "LOADING CORE_KERNEL.SYS...", "INITIALIZING INTERFACE...", "DECRYPTING PORTFOLIO_DATA..."];
     bootSound();
-    for(let l of logs) {
-        boot.innerHTML += l + "<br>";
-        clickSound();
-        await new Promise(r => setTimeout(r, 450));
-    }
-
-    // Progress Bar
+    for(let l of logs) { boot.innerHTML += l + "<br>"; clickSound(); await new Promise(r => setTimeout(r, 400)); }
     for(let i=0; i<=20; i++) {
         let pct = i * 5;
-        let barStr = "[" + "||".repeat(i) + ".".repeat(20-i) + "] " + pct + "%";
-        boot.innerHTML = logs.join("<br>") + "<br><br>" + barStr;
+        boot.innerHTML = logs.join("<br>") + "<br><br>[" + "||".repeat(i) + ".".repeat(20-i) + "] " + pct + "%";
         if(i % 2 === 0) playSound(100 + (i*5), 'sine', 0.05, 0.03);
-        await new Promise(r => setTimeout(r, 60));
+        await new Promise(r => setTimeout(r, 50));
     }
-    boot.innerHTML += "<br><br>SYSTEM_READY_V3.0<br>---";
-    await new Promise(r => setTimeout(r, 600));
+    boot.innerHTML += "<br><br>SYSTEM_READY_V3.3<br>---";
+    await new Promise(r => setTimeout(r, 500));
     boot.style.display = 'none';
     startContent();
 }
 
-// --- TYPEWRITER & SEQUENCER ---
 async function startContent() {
     document.getElementById('active-line').style.display = 'block';
     const sequence = [
-        { id: "sec-1", textId: "type-title", speed: 40 },
-        { id: "sec-2", textId: "type-bio", speed: 20 },
+        { id: "sec-1", textId: "type-title", speed: 30 },
+        { id: "sec-2", textId: "type-bio", speed: 15 },
         { id: "sec-3", textId: null },
         { id: "sec-4", textId: null }
     ];
-
     for (let step of sequence) {
         let el = document.getElementById(step.id);
         el.style.display = "block";
         if (step.textId) {
             let textEl = document.getElementById(step.textId);
-            let content = textEl.innerHTML;
-            textEl.innerHTML = "";
+            let content = textEl.innerHTML; textEl.innerHTML = "";
             await typeWriter(textEl, content, step.speed);
         }
-        await new Promise(r => setTimeout(r, 500));
+        terminalContent.scrollTop = terminalContent.scrollHeight;
+        await new Promise(r => setTimeout(r, 300));
     }
 }
 
 function typeWriter(element, fullText, speed) {
     return new Promise(resolve => {
-        let i = 0;
-        let parts = fullText.match(/(<[^>]*>|[^<])/g);
+        let i = 0; let parts = fullText.match(/(<[^>]*>|[^<])/g);
         function write() {
             if (i < parts.length) {
                 element.innerHTML += parts[i];
                 if (parts[i] !== "<br>" && parts[i].length === 1) clickSound();
-                i++;
-                setTimeout(write, speed);
+                i++; setTimeout(write, speed);
             } else resolve();
         }
         write();
     });
 }
 
-// APP START
 document.getElementById('start-button').onclick = () => {
     document.getElementById('overlay').style.display = 'none';
     audioCtx.resume();
@@ -366,12 +372,10 @@ document.getElementById('start-button').onclick = () => {
 };
 
 function updateClock() {
-    const now = new Date();
-    document.getElementById('uptime').textContent = now.toLocaleTimeString('it-IT');
+    document.getElementById('uptime').textContent = new Date().toLocaleTimeString('it-IT');
 }
 setInterval(updateClock, 1000);
 updateClock();
 </script>
-
 </body>
 </html>
