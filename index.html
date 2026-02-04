@@ -2,326 +2,322 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Daniele Falcone</title>
+  <title>daniele_falcone_terminal_v2</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
+    /* IMPORTANTE: Assicurati di caricare il Suisse Mono correttamente. 
+       Sostituisci i percorsi con quelli dei tuoi file font.
+    */
+    @font-face {
+      font-family: 'Suisse Mono';
+      src: local('Suisse Intl Mono Trial Bold'),
+           local('SuisseIntlMonoTrial-Bold'),
+           url('fonts/SuisseIntlMonoTrial-Bold.otf') format('opentype');
+      font-weight: bold;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'Suisse Mono';
+      src: local('Suisse Intl Mono Trial Regular'),
+           local('SuisseIntlMonoTrial-Regular'),
+           url('fonts/SuisseIntlMonoTrial-Regular.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'Suisse Mono';
+      src: local('Suisse Intl Mono Trial Thin'),
+           local('SuisseIntlMonoTrial-Thin'),
+           url('fonts/SuisseIntlMonoTrial-Thin.otf') format('opentype');
+      font-weight: 100;
+      font-style: normal;
+    }
+
+    :root {
+      --accent-color: #55ff00;
+      --bg-dark: #020202;
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
-    .hero > * {
-      position: relative;
-      z-index: 2;
-    }
-
-    html {
-      scroll-behavior: smooth;
+      text-transform: uppercase;
     }
 
     body {
-      color: var(--copper-text);
+      background-color: var(--bg-dark);
+      color: var(--accent-color);
+      font-family: 'Suisse Mono', monospace;
+      padding: 60px 8vw; /* Layout allargato e non centrato */
+      line-height: 1.5;
+      overflow-x: hidden;
     }
 
-    /* -------- HERO -------- */
+    /* EFFETTI CRT */
+    body::before {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+      z-index: 1000;
+      background-size: 100% 2px;
+      pointer-events: none;
+      opacity: 0.3;
+    }
 
-    .hero {
-      position: relative;
-      min-height: 100vh;
-      padding: 80px;
+    /* INFO DI SISTEMA (TOP & BOTTOM) */
+    .sys-info {
+      font-weight: 100;
+      font-size: 10px;
+      letter-spacing: 2px;
+      opacity: 0.5;
+      margin-bottom: 40px;
+      border-bottom: 1px solid var(--accent-color); /* Usa la variabile invece del rosa fisso */
+      opacity: 0.5;
+      padding-bottom: 10px;
       display: flex;
-      flex-direction: column;
       justify-content: space-between;
-      background-color: var(--copper);
-      transition: background-color 2s ease;
+    }
+
+    .sys-footer {
+      margin-top: 80px;
+      border-top: 1px solid var(--accent-color);
+      padding-top: 10px;
+      font-weight: 100;
+      font-size: 10px;
+      opacity: 0.5;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* CONTENUTI */
+    .prompt {
+      font-weight: bold;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .prompt::before { content: "root@d_falcone:~$ "; opacity: 0.7; }
+
+    .section {
+      margin-bottom: 60px;
+      display: none; /* Per l'effetto comparsa */
     }
 
     h1 {
-      font-size: clamp(4rem, 12vw, 10rem);
-      font-weight: 600;
-      line-height: 0.95;
-      letter-spacing: -0.04em;
-      max-width: 900px;
+      font-family: 'Suisse Mono', monospace;
+      font-weight: bold;
+      font-size: clamp(2rem, 10vw, 6rem);
+      line-height: 0.9;
+      margin: 20px 0;
+      letter-spacing: -2px;
     }
 
-    .meta {
-      max-width: 420px;
-      font-size: 0.95rem;
-      line-height: 1.5;
+    .desc-text {
+      font-weight: normal;
+      max-width: 600px;
+      font-size: 16px;
     }
 
-    .nav {
-      display: flex;
-      gap: 32px;
-      font-size: 0.9rem;
-    }
-
-    .nav a {
+    /* NAV & ESERCIZI */
+    .menu-list { list-style: none; margin-top: 15px; }
+    .menu-item { margin-bottom: 8px; }
+    
+    .menu-link {
+      font-weight: normal;
       text-decoration: none;
-      color: var(--copper-text);
-      border-bottom: 1px solid var(--copper-text);
-      cursor: pointer;
+      color: var(--accent-color);
+      padding: 4px 10px;
+      border: 1px solid transparent;
+      transition: 0.1s;
+    }
+    .menu-link:hover {
+      background: var(--accent-color);
+      color: #000;
     }
 
-    .phase {
-      font-size: 0.8rem;
-      margin-top: 16px;
+    .file-table { margin-top: 20px; width: 100%; max-width: 800px; }
+    .file-row {
+      display: grid;
+      grid-template-columns: 120px 150px 1fr;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 12px;
     }
+    .file-row.header { font-weight: bold; opacity: 0.4; text-transform: lowercase; }
+    .perms { font-weight: 100; opacity: 0.5; }
+    .file-name a { color: #fff; text-decoration: none; font-weight: bold; }
 
-    .meta,
-    .phase {
-      color: var(--copper-text);
-      opacity: 0.85;
+    /* CURSOR */
+    .cursor {
+      display: inline-block;
+      width: 12px;
+      height: 1.2em;
+      background: var(--accent-color);
+      animation: blink 0.8s step-end infinite;
+      vertical-align: middle;
+      margin-left: 5px;
     }
+    @keyframes blink { 50% { opacity: 0; } }
 
-    /* -------- ESERCIZI -------- */
-
-    .exercises {
-      padding: 120px 80px;
-      background: #fff;
-    }
-
-    .exercises h2 {
-      font-size: 2.4rem;
-      font-weight: 500;
-      margin-bottom: 48px;
-    }
-
-    .exercise {
-      font-size: 1.1rem;
-      color: var(--copper-text);
-    }
-
-    .exercise span {
-      font-size: 0.8rem;
-      color: #888;
-      margin-right: 12px;
-    }
-
-    .exercise a {
-      text-decoration: none;
-      border-bottom: 1px solid currentColor;
-      color: inherit;
-    }
-
-    @media (max-width: 768px) {
-      .hero {
-        padding: 40px 24px;
-      }
-
-      .exercises {
-        padding: 80px 24px;
-      }
-
-      .nav {
-        flex-wrap: wrap;
-        gap: 16px;
-      }
-
-      .meta {
-        max-width: 100%;
-      }
-
-      h1 {
-        font-size: clamp(3rem, 14vw, 6rem);
-      }
-    }
-
+    /* MODALE */
     .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.35);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+      display: flex; align-items: center; justify-content: center; z-index: 2000;
     }
-
     .modal-content {
-      background: var(--copper);
-      color: #111;
-      padding: 24px;
-      width: 90%;
-      max-width: 360px;
-      border-radius: 16px;
-      position: relative;
+      border: 1px solid var(--accent-color); padding: 40px; text-align: center;
+      background: #000; max-width: 400px; width: 90%;
     }
-
-    .modal-title {
-      font-size: 1.1rem;
-      margin-bottom: 16px;
-    }
-
-    .captcha {
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-
-    #emailReveal {
-      margin-top: 20px;
-    }
-
-    #emailReveal a {
-      text-decoration: none;
-      border-bottom: 1px solid currentColor;
-      color: inherit;
-    }
-
-    .close {
-      position: absolute;
-      top: 12px;
-      right: 14px;
-      background: none;
-      border: none;
-      font-size: 1.4rem;
-      cursor: pointer;
-    }
-
-    .hidden {
-      display: none;
-    }
+    .hidden { display: none; }
   </style>
 </head>
 
 <body>
-  <!-- HERO -->
-  <section class="hero">
-    <h1>Daniele<br />Falcone</h1>
 
-    <div class="meta">
-      Studente di Comunicazione visiva.<br />
+  <div class="sys-info">
+    <span>OS_KERNEL: 2.4.0-DF</span>
+    <span>STATION: MEND_CH_904</span>
+    <span>Uptime: 00:04:22</span>
+  </div>
+
+  <div class="terminal-main">
+    
+    <div class="section" id="sec-1">
+      <span class="prompt">exec profile_init</span>
+      <h1 id="type-title">DANIELE FALCONE</h1>
     </div>
 
-    <div>
-      <nav class="nav">
-        <a href="https://www.instagram.com/dadiccs" target="_blank">Instagram</a>
-        <a href="https://www.behance.net/danielefalcone1" target="_blank">Behance</a>
-        <a href="#" id="emailBtn">Email</a>
-        <a id="goExercises">Esercizi ↓</a>
-      </nav>
-
-      <div class="phase" id="phaseText"></div>
+    <div class="section" id="sec-2">
+      <span class="prompt">cat bio.log</span>
+      <p class="desc-text" id="type-bio">
+        STUDENTE DI COMUNICAZIONE VISIVA.<br>
+        SPECIALIZZAZIONE: VISUAL DESIGN / DIGITAL ARTS.
+      </p>
     </div>
-  </section>
 
-  <!-- ESERCIZI -->
-  <section class="exercises" id="esercizi">
-    <h2>Esercizi</h2>
-
-    <div class="exercise" id="exercise1">
-      <span>Lun 2 Feb</span>
-      <a href="#" target="_blank">Esercizio 1 — Homepage</a><br>
-      <br>
-      <span>Mar 3 Feb</span>
-      <a href="https://dadiccs.github.io/miosito/giorno2/" target="_blank">Esercizio 2 — Me, Myself and AI</a>
+    <div class="section" id="sec-3">
+      <span class="prompt">ls --network</span>
+      <ul class="menu-list">
+        <li class="menu-item"><a href="https://www.instagram.com/dadiccs" target="_blank" class="menu-link">> INSTAGRAM</a></li>
+        <li class="menu-item"><a href="https://www.behance.net/danielefalcone1" target="_blank" class="menu-link">> BEHANCE</a></li>
+        <li class="menu-item"><a href="#" id="emailBtn" class="menu-link">> CONTACT_CLIENT</a></li>
+      </ul>
     </div>
-  </section>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      /*
-        FASI DEL RAME
-        0 = rame nuovo
-        4 = completamente ossidato
-      */
-
-      // DATA DI INIZIO PROGETTO 
-      const startDate = new Date("2026-02-02");
-      startDate.setHours(0, 0, 0, 0);
-
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      // giorni passati
-      const daysPassed = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-
-      // fase automatica (max 4)
-      const phaseIndex = Math.min(daysPassed, 4);
-
-      // palette rame → patina
-      const copperPhases = [
-        { r: 255, g: 127, b: 30 }, // rame nuovo
-        { r: 196, g: 110, b: 54 }, // leggermente ossidato
-        { r: 152, g: 126, b: 86 }, // ossidazione media
-        { r: 108, g: 135, b: 102 }, // ossidato
-        { r: 92, g: 156, b: 144 }, // verde acqua
-      ];
-
-      const phaseTexts = [
-        "Fase 1 — rame nuovo, superficie brillante. Torna domani per scoprire come si trasforma",
-        "Fase 2 — ossidazione iniziale. Torna domani per scoprire come si trasforma",
-        "Fase 3 — ossidazione intermedia. Torna domani per scoprire come si trasforma",
-        "Fase 4 — rame ossidato. Torna domani per scoprire come si trasforma",
-        "Fase 5 — patina completa. Congratulazioni, hai scoperto la fase finale di questa pagina web",
-      ];
-
-      const c = copperPhases[phaseIndex];
-      const currentColor = `rgb(${c.r}, ${c.g}, ${c.b})`;
-
-      // applicazione colore
-      document.documentElement.style.setProperty("--copper", currentColor);
-      const darkText = `rgb(${c.r * 0.35}, ${c.g * 0.35}, ${c.b * 0.35})`;
-      document.documentElement.style.setProperty("--copper-text", darkText);
-      document.getElementById("exercise1").style.color = currentColor;
-
-      // testo fase
-      document.getElementById("phaseText").textContent = phaseTexts[phaseIndex];
-
-      // scroll solo su click (rimane invariato)
-      document.getElementById("goExercises").addEventListener("click", () => {
-        document.getElementById("esercizi").scrollIntoView({ behavior: "smooth" });
-      });
-
-      const emailBtn = document.getElementById("emailBtn");
-      const modal = document.getElementById("emailModal");
-      const closeBtn = modal.querySelector(".close");
-      const checkbox = document.getElementById("robotCheck");
-      const reveal = document.getElementById("emailReveal");
-      const emailLink = document.getElementById("emailLink");
-
-      emailBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        modal.classList.remove("hidden");
-      });
-
-      closeBtn.addEventListener("click", () => {
-        modal.classList.add("hidden");
-        checkbox.checked = false;
-        reveal.classList.add("hidden");
-      });
-
-      checkbox.addEventListener("change", () => {
-        if (checkbox.checked) {
-          const user = "daniele.falcone02";
-          const domain = "gmail.com";
-
-          emailLink.href = `mailto:${user}@${domain}`;
-          emailLink.textContent = `${user}@${domain}`;
-          reveal.classList.remove("hidden");
-        }
-      });
-    });
-  </script>
-
-  <!-- EMAIL MODAL -->
-  <div id="emailModal" class="modal hidden">
-    <div class="modal-content">
-      <button class="close">×</button>
-
-      <p class="modal-title">Verifica umana</p>
-
-      <label class="captcha">
-        <input type="checkbox" id="robotCheck" />
-        Non sono un robot
-      </label>
-
-      <div id="emailReveal" class="hidden">
-        <a id="emailLink">Scrivimi</a>
+    <div class="section" id="sec-4">
+      <span class="prompt">cd /exercises && ls -la</span>
+      <div class="file-table">
+        <div class="file-row header">
+          <span>mode</span><span>last_mod</span><span>name</span>
+        </div>
+        <div class="file-row">
+          <span class="perms">drwxr-xr-x</span><span>feb 02 2026</span>
+          <span class="file-name"><a href="#">homepage_v1.sys</a></span>
+        </div>
+        <div class="file-row">
+          <span class="perms">-rwxr-xr-x</span><span>feb 03 2026</span>
+          <span class="file-name"><a href="https://dadiccs.github.io/miosito/giorno2/" target="_blank">me_myself_ai.sh</a></span>
+        </div>
       </div>
     </div>
+
+    <div id="active-line" style="margin-top: 40px;">
+      <span class="prompt"></span><span class="cursor"></span>
+    </div>
+
   </div>
+
+  <div class="sys-footer">
+    <span>PACKETS: SENT[24] RCV[12]</span>
+    <span>LOCAL_TIME: <span id="clock">00:00:00</span></span>
+    <span>MEMORY: 4096GB</span>
+  </div>
+
+  <div id="emailModal" class="modal hidden">
+    <div class="modal-content">
+      <p style="font-size: 12px; margin-bottom: 20px;">[ VALIDATE_USER_IDENTITY ]</p>
+      <label style="cursor: pointer; font-size: 14px;">
+        <input type="checkbox" id="robotCheck"> I AM NOT A SYNTHETIC ENTITY
+      </label>
+      <div id="emailReveal" class="hidden" style="margin-top: 30px; border: 1px dashed var(--accent-color); padding: 15px;">
+        <a id="emailLink" style="color: #000; background: var(--accent-color); padding: 5px 15px; text-decoration: none; font-weight: bold;">SEND_MAIL</a>
+      </div>
+      <button id="closeModal" style="margin-top: 30px; background:none; border:none; color:var(--accent-color); cursor:pointer; font-family:inherit;">[ ESC_BACK ]</button>
+    </div>
+  </div>
+
+<script>
+async function startTerminal() {
+    const sequence = [
+        { id: "sec-1", textId: "type-title", speed: 40 },
+        { id: "sec-2", textId: "type-bio", speed: 20 },
+        { id: "sec-3", textId: null, speed: 0 },
+        { id: "sec-4", textId: null, speed: 0 }
+    ];
+
+    for (let step of sequence) {
+        let el = document.getElementById(step.id);
+        el.style.display = "block";
+        
+        if (step.textId) {
+            let textEl = document.getElementById(step.textId);
+            let content = textEl.innerHTML;
+            textEl.innerHTML = "";
+            await typeWriter(textEl, content, step.speed);
+        }
+        await new Promise(r => setTimeout(r, 400));
+    }
+}
+
+function typeWriter(element, fullText, speed) {
+    return new Promise(resolve => {
+        let i = 0;
+        let parts = fullText.match(/(<[^>]*>|[^<])/g);
+        function write() {
+            if (i < parts.length) {
+                element.innerHTML += parts[i];
+                i++;
+                setTimeout(write, speed);
+            } else { resolve(); }
+        }
+        write();
+    });
+}
+
+// Orologio in tempo reale nel footer
+function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleTimeString('it-IT');
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    startTerminal();
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Modale Email
+    const emailBtn = document.getElementById("emailBtn");
+    const modal = document.getElementById("emailModal");
+    const closeBtn = document.getElementById("closeModal");
+    const checkbox = document.getElementById("robotCheck");
+    const reveal = document.getElementById("emailReveal");
+    const emailLink = document.getElementById("emailLink");
+
+    emailBtn.addEventListener("click", (e) => { e.preventDefault(); modal.classList.remove("hidden"); });
+    closeBtn.addEventListener("click", () => { modal.classList.add("hidden"); checkbox.checked = false; reveal.classList.add("hidden"); });
+    checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+            emailLink.href = `mailto:daniele.falcone02@gmail.com`;
+            reveal.classList.remove("hidden");
+        }
+    });
+});
+</script>
+
 </body>
 </html>
