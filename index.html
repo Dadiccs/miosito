@@ -2,280 +2,343 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>daniele_falcone_terminal_v2</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>daniele_falcone_workstation_v3</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
   <style>
     /* FONT CONFIGURATION */
     @font-face {
       font-family: 'Suisse Mono';
-      src: local('Suisse Intl Mono Trial Bold'),
-           local('SuisseIntlMonoTrial-Bold'),
-           url('fonts/SuisseIntlMonoTrial-Bold.otf') format('opentype');
+      src: local('Suisse Intl Mono Trial Bold'), url('fonts/SuisseIntlMonoTrial-Bold.otf') format('opentype');
       font-weight: bold;
-      font-style: normal;
     }
-
     @font-face {
       font-family: 'Suisse Mono';
-      src: local('Suisse Intl Mono Trial Regular'),
-           local('SuisseIntlMonoTrial-Regular'),
-           url('fonts/SuisseIntlMonoTrial-Regular.otf') format('opentype');
+      src: local('Suisse Intl Mono Trial Regular'), url('fonts/SuisseIntlMonoTrial-Regular.otf') format('opentype');
       font-weight: normal;
-      font-style: normal;
     }
-
     @font-face {
       font-family: 'Suisse Mono';
-      src: local('Suisse Intl Mono Trial Thin'),
-           local('SuisseIntlMonoTrial-Thin'),
-           url('fonts/SuisseIntlMonoTrial-Thin.otf') format('opentype');
+      src: local('Suisse Intl Mono Trial Thin'), url('fonts/SuisseIntlMonoTrial-Thin.otf') format('opentype');
       font-weight: 100;
-      font-style: normal;
     }
 
     :root {
       --accent-color: #00ff64;
       --bg-dark: #020202;
+      --window-border: #333;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      text-transform: uppercase;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; text-transform: uppercase; }
 
     body {
-      background-color: var(--bg-dark);
+      background-color: #000;
       color: var(--accent-color);
       font-family: 'Suisse Mono', monospace;
-      padding: 60px 8vw;
-      line-height: 1.5;
-      overflow-x: hidden;
-      text-shadow: 0 0 5px rgba(0, 255, 100, 0.3);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
     }
 
-    /* EFFETTI CRT */
+    /* EFFETTO CRT */
     body::before {
       content: " ";
       display: block;
       position: fixed;
-      top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
-      z-index: 1000;
+      inset: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+      z-index: 3000;
       background-size: 100% 2px;
       pointer-events: none;
-      opacity: 0.3;
+      opacity: 0.2;
     }
 
-    /* INFO DI SISTEMA */
+    /* --- 6. DRAGGABLE WINDOW --- */
+    #window-frame {
+      position: absolute;
+      width: 85vw;
+      max-width: 1100px;
+      height: 80vh;
+      background: var(--bg-dark);
+      border: 1px solid var(--window-border);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+      z-index: 10;
+    }
+
+    .window-header {
+      background: #111;
+      border-bottom: 1px solid var(--window-border);
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: move;
+      user-select: none;
+      touch-action: none; /* Fondamentale per il drag su mobile */
+    }
+
+    .window-controls { display: flex; gap: 8px; }
+    .control { width: 12px; height: 12px; border: 1px solid var(--accent-color); border-radius: 2px; }
+    .control.close { background: var(--accent-color); }
+
+    /* CONTENUTO */
+    #terminal-content {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 40px;
+      position: relative;
+    }
+
     .sys-info {
       font-weight: 100;
       font-size: 10px;
       letter-spacing: 2px;
       opacity: 0.5;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
       border-bottom: 1px solid var(--accent-color);
       padding-bottom: 10px;
       display: flex;
       justify-content: space-between;
     }
 
-    .sys-footer {
-      margin-top: 80px;
-      border-top: 1px solid var(--accent-color);
-      padding-top: 10px;
+    /* --- 2. LOADING BAR --- */
+    #boot-sequence {
       font-weight: 100;
-      font-size: 10px;
-      opacity: 0.5;
-      display: flex;
-      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 30px;
+      line-height: 1.4;
     }
 
-    /* CONTENUTI */
-    .prompt {
-      font-weight: bold;
-      margin-bottom: 10px;
-      display: block;
-    }
+    .prompt { font-weight: bold; margin-bottom: 10px; display: block; }
     .prompt::before { content: "root@d_falcone:~$ "; opacity: 0.7; }
 
-    .section {
-      margin-bottom: 60px;
-      display: none;
-    }
+    .section { margin-bottom: 60px; display: none; }
 
     h1 {
-      font-family: 'Suisse Mono', monospace;
       font-weight: bold;
-      font-size: clamp(2rem, 10vw, 6rem);
+      font-size: clamp(2rem, 7vw, 5rem);
       line-height: 0.9;
       margin: 20px 0;
       letter-spacing: -2px;
     }
 
-    .desc-text {
-      font-weight: normal;
-      max-width: 600px;
-      font-size: 16px;
-    }
+    .desc-text { max-width: 600px; font-size: 16px; font-weight: normal; }
 
-    /* NAV & BUTTONS (UNIFICATI) */
-    .menu-list { list-style: none; margin-top: 15px; }
-    .menu-item { margin-bottom: 8px; }
-    
     .ui-link {
-      font-weight: normal;
-      text-decoration: none;
-      color: var(--accent-color);
-      padding: 4px 10px;
-      border: 1px solid transparent;
-      transition: 0.1s;
-      display: inline-block;
+      text-decoration: none; color: var(--accent-color);
+      padding: 4px 10px; border: 1px solid transparent;
+      display: inline-block; transition: 0.1s;
     }
-    .ui-link:hover {
-      background: var(--accent-color);
-      color: #000;
-      border-color: var(--accent-color);
-    }
+    .ui-link:hover { background: var(--accent-color); color: #000; }
 
-    /* FILE REPOSITORY STYLE */
-    .file-table { margin-top: 20px; width: 100%; max-width: 800px; }
+    /* REPOSITORY TABLE */
+    .file-table { margin-top: 20px; width: 100%; font-size: 12px; }
     .file-row {
-      display: grid;
-      grid-template-columns: 120px 150px 1fr;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 12px;
+      display: grid; grid-template-columns: 100px 150px 1fr;
+      padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
       align-items: center;
     }
-    .file-row.header { font-weight: bold; opacity: 0.4; text-transform: lowercase; }
-    .perms { font-weight: 100; opacity: 0.5; }
 
-    /* CURSOR */
     .cursor {
-      display: inline-block;
-      width: 12px;
-      height: 1.2em;
-      background: var(--accent-color);
-      animation: blink 0.8s step-end infinite;
+      display: inline-block; width: 12px; height: 1.2em;
+      background: var(--accent-color); animation: blink 0.8s step-end infinite;
       vertical-align: middle;
-      margin-left: 5px;
     }
     @keyframes blink { 50% { opacity: 0; } }
 
-    /* MODALE */
-    .modal {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-      display: flex; align-items: center; justify-content: center; z-index: 2000;
+    /* MOBILE ADAPTATION */
+    @media (max-width: 600px) {
+      #window-frame { width: 95vw; height: 90vh; }
+      #terminal-content { padding: 20px; }
+      h1 { font-size: 2.5rem; }
+      .file-row { grid-template-columns: 80px 1fr; }
+      .file-row span:nth-child(2) { display: none; } /* Nasconde data su mobile */
     }
-    .modal-content {
-      border: 1px solid var(--accent-color); padding: 40px; text-align: center;
-      background: #000; max-width: 400px; width: 90%;
+
+    /* OVERLAY INIZIALE */
+    #overlay {
+      position: fixed; inset: 0; background: #000; z-index: 4000;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 20px;
     }
-    .hidden { display: none; }
+    #start-button {
+      background: transparent; color: var(--accent-color);
+      border: 1px solid var(--accent-color); padding: 15px 30px;
+      font-family: inherit; cursor: pointer; transition: 0.3s;
+    }
+    #start-button:hover { background: var(--accent-color); color: #000; }
   </style>
 </head>
-
 <body>
 
-  <div class="sys-info">
-    <span>OS_KERNEL: 2.4.0-DF</span>
-    <span>STATION: MEND_CH_904</span>
-    <span>UPTIME: 00:04:22</span>
+  <div id="overlay">
+    <div style="font-size: 10px; opacity: 0.5;">AWAITING COMMAND...</div>
+    <button id="start-button">INITIALIZE_SYSTEM</button>
   </div>
 
-  <div class="terminal-main">
-    
-    <div class="section" id="sec-1">
-      <span class="prompt">exec profile_init</span>
-      <h1 id="type-title">DANIELE FALCONE</h1>
+  <div id="window-frame">
+    <div class="window-header" id="drag-handle">
+      <div class="window-controls">
+        <div class="control close"></div>
+        <div class="control"></div>
+        <div class="control"></div>
+      </div>
+      <div style="font-size: 9px; opacity: 0.5; letter-spacing: 1px;">DF_WORKSTATION_V3.0</div>
+      <div style="width: 40px;"></div>
     </div>
 
-    <div class="section" id="sec-2">
-      <span class="prompt">cat bio.log</span>
-      <p class="desc-text" id="type-bio">
-        STUDENTE DI COMUNICAZIONE VISIVA.<br>
-        SPECIALIZZAZIONE: VISUAL DESIGN / DIGITAL ARTS.
-      </p>
-    </div>
+    <div id="terminal-content">
+      <div class="sys-info">
+        <span>CORE_OS: DF_2.4</span>
+        <span>UPTIME: <span id="uptime">00:00:00</span></span>
+      </div>
 
-    <div class="section" id="sec-3">
-      <span class="prompt">ls --network</span>
-      <ul class="menu-list">
-        <li class="menu-item"><a href="https://www.instagram.com/dadiccs" target="_blank" class="ui-link">> INSTAGRAM</a></li>
-        <li class="menu-item"><a href="https://www.behance.net/danielefalcone1" target="_blank" class="ui-link">> BEHANCE</a></li>
-        <li class="menu-item"><a href="#" id="emailBtn" class="ui-link">> CONTACT_CLIENT</a></li>
-      </ul>
-    </div>
+      <div id="boot-sequence"></div>
 
-    <div class="section" id="sec-4">
-      <span class="prompt">cd /exercises && ls -la</span>
-      <div class="file-table">
-        <div class="file-row header">
-          <span>mode</span><span>last_mod</span><span>name</span>
-        </div>
-        <div class="file-row">
-          <span class="perms">drwxr-xr-x</span><span>feb 02 2026</span>
-          <span class="file-name">
-            <a href="#" class="ui-link">> homepage_v1.sys</a>
-          </span>
-        </div>
-        <div class="file-row">
-          <span class="perms">-rwxr-xr-x</span><span>feb 03 2026</span>
-          <span class="file-name">
-            <a href="https://dadiccs.github.io/miosito/giorno2/" target="_blank" class="ui-link">> me_myself_ai.sh</a>
-          </span>
+      <div class="section" id="sec-1">
+        <span class="prompt">exec profile_init</span>
+        <h1 id="type-title">DANIELE FALCONE</h1>
+      </div>
+
+      <div class="section" id="sec-2">
+        <span class="prompt">cat bio.log</span>
+        <p class="desc-text" id="type-bio">
+          STUDENTE DI COMUNICAZIONE VISIVA.<br>
+          SPECIALIZZAZIONE: VISUAL DESIGN / DIGITAL ARTS.
+        </p>
+      </div>
+
+      <div class="section" id="sec-3">
+        <span class="prompt">ls --network</span>
+        <div style="margin-top:15px;">
+            <a href="https://www.instagram.com/dadiccs" target="_blank" class="ui-link">> INSTAGRAM</a><br><br>
+            <a href="https://www.behance.net/danielefalcone1" target="_blank" class="ui-link">> BEHANCE</a><br><br>
+            <a href="mailto:daniele.falcone02@gmail.com" class="ui-link">> CONTACT_CLIENT</a>
         </div>
       </div>
-    </div>
 
-    <div id="active-line" style="margin-top: 40px;">
-      <span class="prompt"></span><span class="cursor"></span>
-    </div>
-
-  </div>
-
-  <div class="sys-footer">
-    <span>PACKETS: SENT[24] RCV[12]</span>
-    <span>LOCAL_TIME: <span id="clock">00:00:00</span></span>
-    <span>MEMORY: 4096GB</span>
-  </div>
-
-  <div id="emailModal" class="modal hidden">
-    <div class="modal-content">
-      <p style="font-size: 12px; margin-bottom: 20px;">[ VALIDATE_USER_IDENTITY ]</p>
-      <label style="cursor: pointer; font-size: 14px;">
-        <input type="checkbox" id="robotCheck"> I AM NOT A SYNTHETIC ENTITY
-      </label>
-      <div id="emailReveal" class="hidden" style="margin-top: 30px; border: 1px dashed var(--accent-color); padding: 15px;">
-        <a id="emailLink" style="color: #000; background: var(--accent-color); padding: 5px 15px; text-decoration: none; font-weight: bold;">SEND_MAIL</a>
+      <div class="section" id="sec-4">
+        <span class="prompt">cd /exercises && ls -la</span>
+        <div class="file-table">
+          <div class="file-row" style="opacity:0.3"><span>mode</span><span>last_mod</span><span>name</span></div>
+          <div class="file-row"><span>drwxr-xr-x</span><span>feb 02</span><span><a href="#" class="ui-link">> homepage_v1.sys</a></span></div>
+          <div class="file-row"><span>-rwxr-xr-x</span><span>feb 03</span><span><a href="https://dadiccs.github.io/miosito/giorno2/" target="_blank" class="ui-link">> me_myself_ai.sh</a></span></div>
+        </div>
       </div>
-      <button id="closeModal" style="margin-top: 30px; background:none; border:none; color:var(--accent-color); cursor:pointer; font-family:inherit;">[ ESC_BACK ]</button>
+
+      <div id="active-line" style="margin-top: 40px; display:none;">
+        <span class="prompt"></span><span class="cursor"></span>
+      </div>
     </div>
   </div>
 
 <script>
-async function startTerminal() {
+// --- 5. AUDIO ENGINE ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSound(freq, type, duration, vol) {
+    try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    } catch(e) {}
+}
+
+const clickSound = () => playSound(150, 'square', 0.05, 0.05);
+const bootSound = () => playSound(60, 'sawtooth', 1.0, 0.1);
+
+// --- 6. DRAGGABLE LOGIC (MOUSE + TOUCH) ---
+const win = document.getElementById('window-frame');
+const handle = document.getElementById('drag-handle');
+let isDragging = false;
+let offset = [0,0];
+
+const startDrag = (e) => {
+    isDragging = true;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    offset = [win.offsetLeft - clientX, win.offsetTop - clientY];
+};
+
+const doDrag = (e) => {
+    if (!isDragging) return;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    win.style.left = (clientX + offset[0]) + 'px';
+    win.style.top = (clientY + offset[1]) + 'px';
+};
+
+const stopDrag = () => isDragging = false;
+
+handle.addEventListener('mousedown', startDrag);
+handle.addEventListener('touchstart', startDrag);
+document.addEventListener('mousemove', doDrag);
+document.addEventListener('touchmove', doDrag, { passive: false });
+document.addEventListener('mouseup', stopDrag);
+document.addEventListener('touchend', stopDrag);
+
+// --- 2. BOOT & LOADING BAR ---
+async function runBoot() {
+    const boot = document.getElementById('boot-sequence');
+    const logs = [
+        "SEARCHING FOR DISK... FOUND",
+        "LOADING CORE_KERNEL.SYS...",
+        "INITIALIZING INTERFACE...",
+        "DECRYPTING PORTFOLIO_DATA..."
+    ];
+
+    bootSound();
+    for(let l of logs) {
+        boot.innerHTML += l + "<br>";
+        clickSound();
+        await new Promise(r => setTimeout(r, 450));
+    }
+
+    // Progress Bar
+    for(let i=0; i<=20; i++) {
+        let pct = i * 5;
+        let barStr = "[" + "||".repeat(i) + ".".repeat(20-i) + "] " + pct + "%";
+        boot.innerHTML = logs.join("<br>") + "<br><br>" + barStr;
+        if(i % 2 === 0) playSound(100 + (i*5), 'sine', 0.05, 0.03);
+        await new Promise(r => setTimeout(r, 60));
+    }
+    boot.innerHTML += "<br><br>SYSTEM_READY_V3.0<br>---";
+    await new Promise(r => setTimeout(r, 600));
+    boot.style.display = 'none';
+    startContent();
+}
+
+// --- TYPEWRITER & SEQUENCER ---
+async function startContent() {
+    document.getElementById('active-line').style.display = 'block';
     const sequence = [
         { id: "sec-1", textId: "type-title", speed: 40 },
         { id: "sec-2", textId: "type-bio", speed: 20 },
-        { id: "sec-3", textId: null, speed: 0 },
-        { id: "sec-4", textId: null, speed: 0 }
+        { id: "sec-3", textId: null },
+        { id: "sec-4", textId: null }
     ];
 
     for (let step of sequence) {
         let el = document.getElementById(step.id);
         el.style.display = "block";
-        
         if (step.textId) {
             let textEl = document.getElementById(step.textId);
             let content = textEl.innerHTML;
             textEl.innerHTML = "";
             await typeWriter(textEl, content, step.speed);
         }
-        await new Promise(r => setTimeout(r, 400));
+        await new Promise(r => setTimeout(r, 500));
     }
 }
 
@@ -286,40 +349,28 @@ function typeWriter(element, fullText, speed) {
         function write() {
             if (i < parts.length) {
                 element.innerHTML += parts[i];
+                if (parts[i] !== "<br>" && parts[i].length === 1) clickSound();
                 i++;
                 setTimeout(write, speed);
-            } else { resolve(); }
+            } else resolve();
         }
         write();
     });
 }
 
+// APP START
+document.getElementById('start-button').onclick = () => {
+    document.getElementById('overlay').style.display = 'none';
+    audioCtx.resume();
+    runBoot();
+};
+
 function updateClock() {
     const now = new Date();
-    document.getElementById('clock').textContent = now.toLocaleTimeString('it-IT');
+    document.getElementById('uptime').textContent = now.toLocaleTimeString('it-IT');
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-    startTerminal();
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    const emailBtn = document.getElementById("emailBtn");
-    const modal = document.getElementById("emailModal");
-    const closeBtn = document.getElementById("closeModal");
-    const checkbox = document.getElementById("robotCheck");
-    const reveal = document.getElementById("emailReveal");
-    const emailLink = document.getElementById("emailLink");
-
-    emailBtn.addEventListener("click", (e) => { e.preventDefault(); modal.classList.remove("hidden"); });
-    closeBtn.addEventListener("click", () => { modal.classList.add("hidden"); checkbox.checked = false; reveal.classList.add("hidden"); });
-    checkbox.addEventListener("change", () => {
-        if (checkbox.checked) {
-            emailLink.href = `mailto:daniele.falcone02@gmail.com`;
-            reveal.classList.remove("hidden");
-        }
-    });
-});
+setInterval(updateClock, 1000);
+updateClock();
 </script>
 
 </body>
