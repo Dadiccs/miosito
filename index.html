@@ -28,7 +28,6 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      transition: background 0.3s ease;
     }
 
     body::before {
@@ -46,7 +45,6 @@
       position: absolute; width: 85vw; max-width: 1100px; height: 85vh;
       background: var(--bg-dark); border: 1px solid var(--window-border);
       display: flex; flex-direction: column; box-shadow: 0 30px 60px rgba(0,0,0,0.8); z-index: 10;
-      transition: background 0.3s ease, border 0.3s ease;
     }
 
     .window-header {
@@ -113,6 +111,16 @@
       border: 1px solid var(--accent-color); padding: 15px 30px;
       font-family: inherit; cursor: pointer;
     }
+
+    .snake-board {
+      font-family: 'Courier New', monospace;
+      line-height: 1.2;
+      letter-spacing: 0px;
+      color: var(--accent-color);
+      font-size: 14px;
+      white-space: pre;
+      margin: 15px 0;
+    }
   </style>
 </head>
 <body>
@@ -123,6 +131,7 @@
     SOCIALS (LINKS)<br>
     WORK &nbsp;&nbsp;&nbsp;(PROJECTS)<br>
     THEME &nbsp;&nbsp;(STYLES)<br>
+    PLAY &nbsp;&nbsp;&nbsp;(GAME)<br>
     CLEAR &nbsp;&nbsp;(RESET)
   </div>
 
@@ -202,28 +211,52 @@ function playSound(freq, type, duration, vol) {
 const clickSound = () => playSound(150, 'square', 0.05, 0.03);
 const cmdSound = () => playSound(300, 'sine', 0.1, 0.05);
 const bootLowSound = (f) => playSound(f, 'sawtooth', 0.1, 0.03);
+const eatSound = () => playSound(440, 'sine', 0.1, 0.05);
+const errorSound = () => playSound(100, 'sawtooth', 0.4, 0.08);
 
 let inputBuffer = "";
 const commandLine = document.getElementById('command-line');
 const history = document.getElementById('history');
 const terminal = document.getElementById('terminal-content');
+const activeLine = document.getElementById('active-line');
+
+let isGameRunning = false;
+let snakeInterval;
+let snakeDir = { x: 1, y: 0 };
+let currentGameElement = null;
 
 document.addEventListener('keydown', (e) => {
     if (document.getElementById('overlay').style.display !== 'none') return;
-    if (e.key === 'Enter') {
-        const cmd = inputBuffer.toLowerCase().trim();
-        handleCommand(cmd);
-        inputBuffer = "";
-        commandLine.textContent = "";
-        cmdSound();
-    } else if (e.key === 'Backspace') {
-        inputBuffer = inputBuffer.slice(0, -1);
-        commandLine.textContent = inputBuffer;
-        clickSound();
-    } else if (e.key.length === 1) {
-        inputBuffer += e.key;
-        commandLine.textContent = inputBuffer;
-        clickSound();
+
+    if (isGameRunning) {
+        if (e.key === 'ArrowUp' && snakeDir.y === 0) snakeDir = { x: 0, y: -1 };
+        if (e.key === 'ArrowDown' && snakeDir.y === 0) snakeDir = { x: 0, y: 1 };
+        if (e.key === 'ArrowLeft' && snakeDir.x === 0) snakeDir = { x: -1, y: 0 };
+        if (e.key === 'ArrowRight' && snakeDir.x === 0) snakeDir = { x: 1, y: 0 };
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+            e.preventDefault();
+            return;
+        }
+        if (e.key === 'Enter' || e.key === 'Escape') { 
+            stopSnake("USER_INTERRUPT"); 
+            return; 
+        }
+    } else {
+        if (e.key === 'Enter') {
+            const cmd = inputBuffer.toLowerCase().trim();
+            handleCommand(cmd);
+            inputBuffer = "";
+            commandLine.textContent = "";
+            cmdSound();
+        } else if (e.key === 'Backspace') {
+            inputBuffer = inputBuffer.slice(0, -1);
+            commandLine.textContent = inputBuffer;
+            clickSound();
+        } else if (e.key.length === 1) {
+            inputBuffer += e.key;
+            commandLine.textContent = inputBuffer;
+            clickSound();
+        }
     }
     terminal.scrollTop = terminal.scrollHeight;
 });
@@ -240,9 +273,13 @@ function handleCommand(cmd) {
     line.innerHTML = `<span class="prompt"></span><span class="command-text">${cmd}</span>`;
     history.appendChild(line);
 
+    if (cmd === "play") {
+        startSnake();
+        return;
+    }
+
     const output = document.createElement('div');
     output.className = 'output-block';
-
     const args = cmd.split(' ');
     const baseCmd = args[0];
 
@@ -257,7 +294,7 @@ function handleCommand(cmd) {
             output.innerHTML = document.getElementById('tpl-work').innerHTML;
             break;
         case 'help':
-            output.innerHTML = `COMANDI DISPONIBILI:<br>ABOUT: BIO<br>SOCIALS: CONTATTI<br>WORK: PROGETTI<br>THEME [NOME]: CAMBIA TEMA (DEFAULT, RETRO, HACKER)<br>CLEAR: RESET`;
+            output.innerHTML = `COMANDI DISPONIBILI:<br>ABOUT, SOCIALS, WORK, PLAY, THEME [NOME], CLEAR`;
             break;
         case 'clear':
             history.innerHTML = "";
@@ -283,6 +320,76 @@ function handleCommand(cmd) {
     terminal.scrollTop = terminal.scrollHeight;
 }
 
+function startSnake() {
+    isGameRunning = true;
+    activeLine.style.display = 'none';
+    
+    currentGameElement = document.createElement('pre');
+    currentGameElement.className = 'snake-board';
+    history.appendChild(currentGameElement);
+    
+    snakeDir = { x: 1, y: 0 };
+    let snake = [{ x: 10, y: 5 }, { x: 9, y: 5 }, { x: 8, y: 5 }];
+    let food = { x: 20, y: 10 };
+    const w = 60; 
+    const h = 15;
+
+    snakeInterval = setInterval(() => {
+        const head = { x: snake[0].x + snakeDir.x, y: snake[0].y + snakeDir.y };
+
+        if (head.x < 0 || head.x >= w || head.y < 0 || head.y >= h || snake.some(s => s.x === head.x && s.y === head.y)) {
+            stopSnake("CRASH", (snake.length-3)*10);
+            return;
+        }
+
+        snake.unshift(head);
+        if (head.x === food.x && head.y === food.y) {
+            eatSound();
+            food = { x: Math.floor(Math.random() * w), y: Math.floor(Math.random() * h) };
+        } else {
+            snake.pop();
+        }
+
+        // Render con Cornice ASCII
+        let scoreStr = ` SCORE: ${(snake.length-3)*10} `;
+        let topBorder = "╔" + scoreStr + "═".repeat(w - scoreStr.length) + "╗\n";
+        let board = topBorder;
+        
+        for (let y = 0; y < h; y++) {
+            board += "║";
+            for (let x = 0; x < w; x++) {
+                if (x === head.x && y === head.y) board += "█";
+                else if (snake.some(s => s.x === x && s.y === y)) board += "▓";
+                else if (x === food.x && y === food.y) board += "×";
+                else board += " ";
+            }
+            board += "║\n";
+        }
+        board += "╚" + "═".repeat(w) + "╝";
+        currentGameElement.textContent = board;
+        terminal.scrollTop = terminal.scrollHeight;
+    }, 110);
+}
+
+function stopSnake(reason, score = 0) {
+    isGameRunning = false;
+    clearInterval(snakeInterval);
+    
+    const statusLine = document.createElement('div');
+    statusLine.className = 'output-block';
+    
+    if (reason === "CRASH") {
+        errorSound();
+        statusLine.innerHTML = `<span style="color:#ff0000">>> PROCESS_TERMINATED: SNAKE_CRASHED. FINAL_SCORE: ${score}</span>`;
+    } else {
+        statusLine.innerHTML = `<span style="opacity:0.5">>> PROCESS_ABORTED BY USER.</span>`;
+    }
+    
+    history.appendChild(statusLine);
+    activeLine.style.display = 'block';
+    terminal.scrollTop = terminal.scrollHeight;
+}
+
 function showCaptchaInTerminal(btn) {
     btn.style.display = 'none';
     btn.parentElement.querySelector('.captcha-box').style.display = 'inline-block';
@@ -300,7 +407,6 @@ function unlockMailInTerminal(cb) {
 
 async function runBoot(skip = false) {
     const boot = document.getElementById('boot-sequence');
-    
     if (!skip) {
         const logs = ["SEARCHING FOR DISK... FOUND", "LOADING CORE_KERNEL.SYS...", "INITIALIZING INTERFACE...", "DECRYPTING PORTFOLIO_DATA..."];
         for(let l of logs) {
@@ -318,19 +424,14 @@ async function runBoot(skip = false) {
         boot.innerHTML += "<br><br>SYSTEM_READY_V3.3<br>---";
         await new Promise(r => setTimeout(r, 600));
     }
-
     boot.style.display = 'none';
-    document.getElementById('active-line').style.display = 'block';
+    activeLine.style.display = 'block';
     handleCommand("about");
-    
-    // Segna che il boot è avvenuto per questa sessione
     sessionStorage.setItem('hasBooted', 'true');
 }
 
-// All'avvio della pagina
 window.onload = () => {
     if (sessionStorage.getItem('hasBooted')) {
-        // Se ha già bootato, nascondi overlay e avvia boot veloce
         document.getElementById('overlay').style.display = 'none';
         runBoot(true);
     }
